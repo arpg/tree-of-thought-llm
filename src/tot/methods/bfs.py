@@ -53,6 +53,8 @@ def solve(args, task, idx, to_print=True):
     x = task.get_input(idx)  # input
     ys = ['']  # current output candidates
     infos = []
+    all_prospective_solutions = []  # To collect all prospective solutions at the final step
+    
     for step in range(task.steps):
         # generation
         if args.method_generate == 'sample':
@@ -83,9 +85,13 @@ def solve(args, task, idx, to_print=True):
         infos.append({'step': step, 'x': x, 'ys': ys, 'new_ys': new_ys, 'values': values, 'select_new_ys': select_new_ys})
         ys = select_new_ys
     
+    # Collect all final layer prospective solutions
+    all_prospective_solutions = ys
+    
     if to_print: 
         print(ys)
-    return ys, {'steps': infos}
+    
+    return ys, {'steps': infos}, all_prospective_solutions
 
 def naive_solve(args, task, idx, to_print=True):
     global gpt
