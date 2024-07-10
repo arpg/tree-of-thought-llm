@@ -53,7 +53,7 @@ def solve(args, task, idx, to_print=True):
     x = task.get_input(idx)  # input
     ys = ['']  # current output candidates
     infos = []
-    all_prospective_solutions = []  # To collect all prospective solutions at the final step
+    all_solutions_with_values = []  # New list to track all solutions and their values
     
     for step in range(task.steps):
         # generation
@@ -63,11 +63,15 @@ def solve(args, task, idx, to_print=True):
             new_ys = [get_proposals(task, x, y) for y in ys]
         new_ys = list(itertools.chain(*new_ys))
         ids = list(range(len(new_ys)))
+        
         # evaluation
         if args.method_evaluate == 'vote':
             values = get_votes(task, x, new_ys, args.n_evaluate_sample)
         elif args.method_evaluate == 'value':
             values = get_values(task, x, new_ys, args.n_evaluate_sample)
+        
+        # Add all new solutions and their values to the tracking list
+        all_solutions_with_values.extend(zip(new_ys, values))
 
         # selection
         if args.method_select == 'sample':
@@ -85,13 +89,17 @@ def solve(args, task, idx, to_print=True):
         infos.append({'step': step, 'x': x, 'ys': ys, 'new_ys': new_ys, 'values': values, 'select_new_ys': select_new_ys})
         ys = select_new_ys
     
-    # Collect all final layer prospective solutions
-    all_prospective_solutions = ys
+    # Sort all solutions by their values and get the top n
+    n = args.n_select_sample  # You might want to make this a separate parameter
+    top_n_solutions = sorted(all_solutions_with_values, key=lambda x: x[1], reverse=True)[:n]
+    top_n_solutions = [sol for sol, _ in top_n_solutions]
     
     if to_print: 
-        print(ys)
+        print(f"Top {n} solutions across all steps:")
+        for sol in top_n_solutions:
+            print(f"Solution: {sol}")
     
-    return ys, {'steps': infos}, all_prospective_solutions
+    return ys, {'steps': infos}, top_n_solutions
 
 def naive_solve(args, task, idx, to_print=True):
     global gpt
