@@ -53,7 +53,6 @@ def solve(args, task, idx, to_print=True):
     x = task.get_input(idx)  # input
     ys = ['']  # current output candidates
     infos = []
-    all_solutions_with_values = []  # New list to track all solutions and their values
     
     for step in range(task.steps):
         # generation
@@ -70,9 +69,6 @@ def solve(args, task, idx, to_print=True):
         elif args.method_evaluate == 'value':
             values = get_values(task, x, new_ys, args.n_evaluate_sample)
         
-        # Add all new solutions and their values to the tracking list
-        all_solutions_with_values.extend(zip(new_ys, values))
-
         # selection
         if args.method_select == 'sample':
             ps = np.array(values) / sum(values)
@@ -89,17 +85,15 @@ def solve(args, task, idx, to_print=True):
         infos.append({'step': step, 'x': x, 'ys': ys, 'new_ys': new_ys, 'values': values, 'select_new_ys': select_new_ys})
         ys = select_new_ys
     
-    # Sort all solutions by their values and get the top n
-    n = args.n_select_sample  # You might want to make this a separate parameter
-    top_n_solutions = sorted(all_solutions_with_values, key=lambda x: x[1], reverse=True)[:n]
-    top_n_solutions = [sol for sol, _ in top_n_solutions]
+    # Return all generations from the final step
+    final_generations = infos[-1]['new_ys']
     
     if to_print: 
-        print(f"Top {n} solutions across all steps:")
-        for sol in top_n_solutions:
-            print(f"Solution: {sol}")
+        print(f"Final round generations:")
+        for gen in final_generations:
+            print(f"Generation: {gen}")
     
-    return ys, {'steps': infos}, top_n_solutions
+    return ys, {'steps': infos}, final_generations
 
 def naive_solve(args, task, idx, to_print=True):
     global gpt
