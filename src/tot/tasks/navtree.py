@@ -26,7 +26,7 @@ class NavTree(Task):
         return len(self.data)
     
     def get_input(self, idx: int) -> str:
-        return self.data[idx]
+        return self.data
     
     def test_output(self, idx: int, output: str):
         output = output.split('Passage:\n')[-1]
