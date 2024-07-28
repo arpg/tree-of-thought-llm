@@ -1,7 +1,7 @@
 import os
 import re
 from tot.tasks.base import Task, DATA_PATH
-from tot.prompts.text import *
+from tot.prompts.navtree import *
 from tot.models import gpt
 
 
@@ -31,7 +31,7 @@ class NavTree(Task):
     def test_output(self, idx: int, output: str):
         output = output.split('Passage:\n')[-1]
         prompt = score_prompt + output
-        score_outputs = gpt(prompt, n=5, model='gpt-4')
+        score_outputs = gpt(prompt, n=5, model='gpt-3.5-turbo')
         scores = []
         for score_output in score_outputs:
             # print(score_output)
