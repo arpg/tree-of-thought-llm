@@ -13,13 +13,12 @@ class NavTree(Task):
     Input Example: 
     Output Example: 
     """
-    def __init__(self, file='data_100_random_text.txt'):
+    def __init__(self, prompt):
         """
         file: a text file, each line is some sentences
         """
         super().__init__()
-        path = os.path.join(DATA_PATH, 'text', file)
-        self.data = open(path).readlines()
+        self.data = prompt
         self.steps = 2
         self.stops = ['\nPassage:\n', None]
 
@@ -95,3 +94,4 @@ class NavTree(Task):
         else:
             print(f'-----------------compare no match: {[compare_output]}')
             return -1
+        
